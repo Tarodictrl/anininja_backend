@@ -12,7 +12,7 @@ env:
   USERNAME: ${{ secrets.SERVER_USER }}
   PASSWORD: ${{ secrets.SERVER_PASSWORD }}
   ENV_SECRET: ${{ secrets.ENV_SECRET }}
-
+  NAME: "anininja_backend"
 jobs:
   build_and_push_to_registry:
     name: Push Docker image to Github registry
@@ -62,8 +62,8 @@ jobs:
           username: ${{ env.USERNAME }}
           password: ${{ env.PASSWORD }}
           script: |
-            mkdir -p ${{ github.repository }}
-            cd ${{ github.repository }}
+            mkdir -p ${{ env.NAME }}
+            cd ${{ env.NAME }}
             echo "Creating .env file..."
             touch .env
             echo "${{ env.ENV_SECRET }}" | base64 -di > .env
@@ -71,9 +71,9 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin;
             docker pull ${{ fromJSON(steps.meta.outputs.json).tags[0] }};
             echo "Stopping and removing old container..."
-            docker container stop ${{ github.repository }} &>/dev/null || echo "Cant stop container";
-            docker container rm ${{ github.repository }} &>/dev/null || echo "Cant remove container";
-            docker run --name ${{ github.repository }} --restart=always \
+            docker container stop ${{ env.NAME }} &>/dev/null || echo "Cant stop container";
+            docker container rm ${{ env.NAME }} &>/dev/null || echo "Cant remove container";
+            docker run --name ${{ env.NAME }} --restart=always \
               --env-file .env -d --net=host \
               ${{ fromJSON(steps.meta.outputs.json).tags[0] }} poetry run uvicorn app.main:app --port 8000
             echo "Logging out from dockerhub..."
