@@ -60,7 +60,7 @@ jobs:
           environment: main
           host: ${{ env.HOST }}
           username: ${{ env.USERNAME }}
-          password: ${{ env.SERVER_PASSWORD }}
+          password: ${{ env.PASSWORD }}
           script: |
             mkdir -p ${{ github.repository }}
             cd ${{ github.repository }}
