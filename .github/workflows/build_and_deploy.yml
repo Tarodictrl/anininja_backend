@@ -1,0 +1,83 @@
+name: Build and Deploy AniNinja
+
+on:
+  push:
+    branches:
+      - main
+
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  HOST: ${{ secrets.SERVER_IP }}
+  USERNAME: ${{ secrets.SERVER_USER }}
+  PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+  ENV_SECRET: ${{ secrets.ENV_SECRET }}
+
+jobs:
+  build_and_push_to_registry:
+    name: Push Docker image to Github registry
+    runs-on: hetzner
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.triggering_actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: |-
+            linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  deploy:
+    runs-on: hetzner
+    needs: build_and_push_to_registry
+    steps:
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.HOST }}
+          username: ${{ env.USERNAME }}
+          password: ${{ env.SERVER_PASSWORD }}
+          script: |
+            mkdir -p ${{ github.repository }}
+            cd ${{ github.repository }}
+            echo "Creating .env file..."
+            touch .env
+            echo "${{ env.ENV_SECRET }}" | base64 -di > .env
+            echo "Logging in to ghcr.io..."
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin;
+            docker pull ${{ fromJSON(steps.meta.outputs.json).tags[0] }};
+            echo "Stopping and removing old container..."
+            docker container stop ${{ github.repository }} &>/dev/null || echo "Cant stop container";
+            docker container rm ${{ github.repository }} &>/dev/null || echo "Cant remove container";
+            docker run --name ${{ github.repository }} --restart=always \
+              --env-file .env -d --net=host \
+              ${{ fromJSON(steps.meta.outputs.json).tags[0] }} poetry run uvicorn app.main:app --port 8000
+            echo "Logging out from dockerhub..."
+            docker logout
+            echo "Done!"
+            echo "Removing .env file..."
+            rm .env
