@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -17,7 +16,7 @@ env:
 jobs:
   build_and_push_to_registry:
     name: Push Docker image to Github registry
-    runs-on: hetzner
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
@@ -47,7 +46,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   deploy:
-    runs-on: hetzner
+    runs-on: self-hosted
     needs: build_and_push_to_registry
     steps:
       - name: Extract metadata (tags, labels) for Docker
