@@ -8,4 +8,4 @@ RUN pip install --upgrade pip \
 COPY . /code/
 RUN poetry install --without dev
 EXPOSE 8000
-CMD ["poetry", "run", "gunicorn", "app.main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--timeout", "18000", "--bind", "0.0.0.0:8000"]
+CMD ["poetry", "run", "unicorn", "app.main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--timeout", "18000", "--bind", "0.0.0.0:8000"]
