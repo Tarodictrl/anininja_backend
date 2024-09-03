@@ -57,6 +57,7 @@ jobs:
       - name: executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
         with:
+          environment: main
           host: ${{ env.HOST }}
           username: ${{ env.USERNAME }}
           password: ${{ env.SERVER_PASSWORD }}
