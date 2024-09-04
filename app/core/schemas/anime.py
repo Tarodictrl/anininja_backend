@@ -1,4 +1,3 @@
-from datetime import date
 from typing_extensions import Type
 
 from pydantic import Field, BaseModel
@@ -25,7 +24,7 @@ class AnimeBase(BaseModelConfig):
     season: int | None = Field(default=None)
     type: str | None = Field(default=None)
     age: str | None = Field(default=None)
-    release_date: date | None = Field(default=None, alias="releaseDate")
+    kodik_link: str | None = Field(default=None)
 
 
 class AnimeUpdate(AnimeBase):

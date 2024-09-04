@@ -81,6 +81,9 @@ class Anime(Base):
     age: Mapped[str] = mapped_column(
         String,
     )
+    kodik_link: Mapped[str] = mapped_column(
+        String,
+    )
 
     genres: Mapped[list[Genre]] = relationship(secondary="anime_genre", lazy="selectin", viewonly=True)
     directors: Mapped[list[Director]] = relationship(secondary="anime_director", lazy="selectin", viewonly=True)
