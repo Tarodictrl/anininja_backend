@@ -25,6 +25,7 @@ class AnimeBase(BaseModelConfig):
     type: str | None = Field(default=None)
     age: str | None = Field(default=None)
     kodik_link: str | None = Field(default=None)
+    url: str | None = Field(default=None)
 
 
 class AnimeUpdate(AnimeBase):

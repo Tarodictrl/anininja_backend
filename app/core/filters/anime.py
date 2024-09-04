@@ -1,3 +1,5 @@
+from typing_extensions import Literal
+
 from pydantic import Field
 from fastapi import Query
 
@@ -12,3 +14,5 @@ class AnimeFilter(BaseIdNameFilter):
     season: int | None = Field(Query(default=None, description="season", ge=1, le=4))
     type: str | None = Field(Query(default=None, description="type"))
     age: str | None = Field(Query(default=None, description="age"))
+    order_by: Literal["relevance", "year", "name"] | None = Field(Query(default="relevance", description="order_by"))
+    direction: Literal["asc", "desc"] | None = Field(Query(default=None, description="direction"))
