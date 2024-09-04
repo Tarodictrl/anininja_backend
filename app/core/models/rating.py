@@ -27,3 +27,6 @@ class Rating(Base):
     worldart_rating: Mapped[float] = mapped_column(
         Float,
     )
+    avg_rating: Mapped[float] = mapped_column(
+        Float,
+    )

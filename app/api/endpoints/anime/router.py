@@ -1,4 +1,5 @@
 from typing_extensions import Annotated, Doc
+from random import randint
 
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,6 +25,31 @@ async def get_all_anime(
 
     anime, total = await anime_crud.get_all(session=session, filter=filter)
     return BaseResponseDataMapper(anime, total=total).result_schema
+
+
+@router.get(
+    "/random",
+    response_model=AnimeResponseBase,
+    status_code=status.HTTP_200_OK,
+)
+async def get_random_anime(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+):
+    obj_id = randint(1, 8500)
+    anime = await anime_crud.get_by_id(session=session, obj_id=obj_id)
+    return anime
+
+
+@router.get(
+    "/chart",
+    response_model=list[AnimeResponseBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_chart_anime(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+):
+    anime = await anime_crud.get_chart(session=session)
+    return anime
 
 
 @router.get(
