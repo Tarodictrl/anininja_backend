@@ -5,13 +5,14 @@ This module contains a generic class for CRUD operations.
 from dataclasses import dataclass
 from typing_extensions import Any, Generic, Type, TypeVar
 
-from sqlalchemy import select, func, text, literal_column
+from sqlalchemy import select, func, text, literal_column, desc, asc
 from sqlalchemy.orm import Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from pydantic import BaseModel
 
 from app.core.db import Base
+from app.core.models.rating import Rating
 
 ModelType = TypeVar("ModelType", bound=Base)  # type: ignore
 PydanticModel = TypeVar("PydanticModel", bound=BaseModel)
@@ -43,6 +44,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         - A list of objects of the specified model.
         """
         stmt = await self.filter_constructor(select(self.model), filter)
+        stmt = await self.order_by_constructor(stmt, filter)
         db_objs = await session.scalars(stmt)
         total_stmt = await self.filter_constructor(select(func.count(self.model.id)),
                                                    filter, use_limit=False, use_offset=False)
@@ -211,4 +213,15 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 stmt = stmt.limit(value)
             elif key == "offset" and use_offset:
                 stmt = stmt.offset(value)
+        return stmt
+
+    async def order_by_constructor(self, stmt: Query, filter: PydanticModel) -> Query:
+        order_by = filter.order_by
+        direction = filter.direction
+        if hasattr(self.model, order_by):
+            stmt = stmt.order_by(asc(literal_column(order_by) if direction == "asc" else desc(literal_column(order_by))))
+        else:
+            # TODO: Затычка
+            if order_by == "relevance":
+                stmt = stmt.join(Rating).order_by(Rating.avg_rating.desc() if direction == "asc" else Rating.avg_rating).where(Rating.avg_rating != None)
         return stmt

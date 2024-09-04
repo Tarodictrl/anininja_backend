@@ -15,6 +15,7 @@ class RatingBase(BaseModelConfig):
     anidub_rating: float | None
     myanimelist_rating: float | None
     worldart_rating: float | None
+    avg_rating: float | None
 
 
 class RatingUpdate(RatingBase):
