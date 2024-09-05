@@ -14,5 +14,6 @@ class AnimeFilter(BaseIdNameFilter):
     season: int | None = Field(Query(default=None, description="season", ge=1, le=4))
     type: str | None = Field(Query(default=None, description="type"))
     age: str | None = Field(Query(default=None, description="age"))
+    url: str | None = Field(Query(default=None, description="url"))
     order_by: Literal["relevance", "year", "name"] | None = Field(Query(default="relevance", description="order_by"))
-    direction: Literal["asc", "desc"] | None = Field(Query(default=None, description="direction"))
+    direction: Literal["asc", "desc"] | None = Field(Query(default="asc", description="direction"))
