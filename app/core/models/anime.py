@@ -42,6 +42,21 @@ class AnimeDirector(Base):
     )
 
 
+class AnimeStudio(Base):
+    __tablename__ = "anime_studio"
+
+    anime_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("anime.id"),
+        primary_key=True,
+    )
+    studio_id: Mapped[str] = mapped_column(
+        Integer,
+        ForeignKey("studio.id"),
+        primary_key=True,
+    )
+
+
 class Anime(Base):
     __tablename__ = "anime"
 
@@ -90,6 +105,6 @@ class Anime(Base):
 
     genres: Mapped[list[Genre]] = relationship(secondary="anime_genre", lazy="selectin", viewonly=True)
     directors: Mapped[list[Director]] = relationship(secondary="anime_director", lazy="selectin", viewonly=True)
-    studio: Mapped[Studio] = relationship(lazy="selectin", viewonly=True)
+    studios: Mapped[list[Studio]] = relationship(secondary="anime_studio", lazy="selectin", viewonly=True)
     poster: Mapped[Poster] = relationship(lazy="selectin", viewonly=True)
     rating: Mapped[Rating] = relationship(lazy="selectin", viewonly=True)
