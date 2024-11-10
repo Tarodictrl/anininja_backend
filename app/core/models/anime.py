@@ -80,10 +80,6 @@ class Anime(Base):
     description: Mapped[str] = mapped_column(
         String(200),
     )
-    studio_id: Mapped[int] = mapped_column(
-        Integer,
-        ForeignKey("studio.id")
-    )
     year: Mapped[int] = mapped_column(
         Integer,
     )

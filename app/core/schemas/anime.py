@@ -19,7 +19,6 @@ class AnimeBase(BaseModelConfig):
     status: str | None = Field(default=None)
     count_series: int = Field(default=0, alias="countSeries")
     description: str | None = Field(default=None)
-    studio_id: int | None = Field(default=None, alias="studioId")
     year: int | None = Field(default=None)
     season: int | None = Field(default=None)
     type: str | None = Field(default=None)
@@ -39,10 +38,10 @@ class AnimeCreate(AnimeBase):
 class AnimeResponseBase(AnimeBase):
     id: int
     poster: PosterBase | None
-    studio: StudioBase | None
     rating: RatingBase | None
     directors: list[DirectorBase] | None = Field(default_factory=list)
     genres: list[GenreBase] | None = Field(default_factory=list)
+    studios: list[StudioBase] | None = Field(default_factory=list)
 
 
 AnimeResponse: Type[BaseModel] = create_response_model(AnimeResponseBase, "AnimeResponse")
