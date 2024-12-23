@@ -24,4 +24,4 @@ class DirectorResponseBase(DirectorBase):
     id: int
 
 
-DirectorResponse: Type[BaseModel] = create_response_model(DirectorResponseBase, "AnimeResponse")
+DirectorResponse: Type[BaseModel] = create_response_model(DirectorResponseBase, "DirectorResponse")

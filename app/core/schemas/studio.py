@@ -24,4 +24,4 @@ class StudioResponseBase(StudioBase):
     id: int
 
 
-StudioResponse: Type[BaseModel] = create_response_model(StudioResponseBase, "GenreResponse")
+StudioResponse: Type[BaseModel] = create_response_model(StudioResponseBase, "StudioResponse")

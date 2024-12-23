@@ -25,4 +25,4 @@ class PosterCreateBase(PosterBase):
     ...
 
 
-PosterCreate: Type[BaseModel] = create_response_model(PosterCreateBase, "GenreResponse")
+PosterResponse: Type[BaseModel] = create_response_model(PosterCreateBase, "PosterResponse")
