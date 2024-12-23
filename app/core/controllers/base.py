@@ -47,11 +47,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def get_by_id(self, obj_id: int, session: AsyncSession) -> ModelType | None:
         return await session.get(self.model, obj_id)
 
-    async def get_by_double_primary_key(
-        self, obj_pk_one: int, obj_pk_two: str, session: AsyncSession
-    ) -> ModelType:
-        return await session.get(self.model, (obj_pk_one, obj_pk_two))
-
     async def get_by_attribute(
         self, attr_name: str, attr_value: str | int, session: AsyncSession
     ) -> ModelType | None:
@@ -75,7 +70,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
         await session.commit()
-        await session.refresh(db_obj)
         return db_obj
 
     async def update(
@@ -120,7 +114,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         if hasattr(self.model, order_by):
             stmt = stmt.order_by(asc(literal_column(order_by) if direction == "asc" else desc(literal_column(order_by))))
         else:
-            # TODO: Затычка
             if order_by == "relevance":
-                stmt = stmt.join(Rating).order_by(Rating.avg_rating.desc() if direction == "asc" else Rating.avg_rating).where(Rating.avg_rating != None)
+                stmt = stmt.join(Rating).order_by(Rating.avg_rating.desc() if direction == "asc" else Rating.avg_rating).where(Rating.avg_rating is not None)
         return stmt

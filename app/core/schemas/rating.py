@@ -26,4 +26,4 @@ class RatingCreateBase(RatingBase):
     ...
 
 
-RatingCreate: Type[BaseModel] = create_response_model(RatingCreateBase, "GenreResponse")
+RatingResponse: Type[BaseModel] = create_response_model(RatingCreateBase, "RatingResponse")

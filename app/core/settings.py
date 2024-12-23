@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     app_title: Annotated[str, Doc("The current project outer name")]
     app_description: Annotated[str, Doc("The current project description")]
     postgres_url: Annotated[str, Doc("Postgres url for connection.")]
+    cloudflare_turnstile_key: Annotated[str, Doc("Cloudflare turnstile key.")]
+    password_secret_key: Annotated[str, Doc("Password secret key.")]
     http_timeout: Annotated[int, Doc("HTTP timeout.")] = Field(default=60 * 10)
 
     @property
