@@ -61,7 +61,6 @@ async def user_login(
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     data: dict = data.model_dump()
-    data.pop("token")
     data.update(password=encrypt_password(data["password"]))
     if not verify_turnstile_token(data.pop("token")):
         raise HTTPException(status_code=400, detail="Неверная капча.")
