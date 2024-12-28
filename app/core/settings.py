@@ -12,6 +12,13 @@ class Settings(BaseSettings):
     cloudflare_turnstile_key: Annotated[str, Doc("Cloudflare turnstile key.")]
     password_secret_key: Annotated[str, Doc("Password secret key.")]
     http_timeout: Annotated[int, Doc("HTTP timeout.")] = Field(default=60 * 10)
+    client_id: Annotated[str, Doc("VK client id.")]
+    secret_key: Annotated[str, Doc("VK secret key.")]
+    redirect_auth_uri: Annotated[str, Doc("VK redirect auth uri.")]
+    redirect_connect_uri: Annotated[str, Doc("VK redirect connect uri.")]
+    host: Annotated[str, Doc("Host for redirect.")]
+    telegram_token: Annotated[str, Doc("Telegram token.")]
+    telegram_bot_id: Annotated[str, Doc("Telegram bot id.")]
 
     @property
     def api_version(self) -> Annotated[str, Doc("The current project version")]:

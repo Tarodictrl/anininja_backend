@@ -19,13 +19,14 @@ class User(Base):
     )
     email: Mapped[str] = mapped_column(
         String,
-        primary_key=True,
+        nullable=True,
     )
     login: Mapped[str] = mapped_column(
         String,
     )
     password: Mapped[str] = mapped_column(
         String,
+        nullable=True,
     )
     avatar: Mapped[str] = mapped_column(
         String,
@@ -33,6 +34,10 @@ class User(Base):
     role: Mapped[str] = mapped_column(
         String,
         default="user"
+    )
+    vk_id: Mapped[int] = mapped_column(
+        Integer,
+        nullable=True,
     )
     registration_date: Mapped[date] = mapped_column(
         Date,
