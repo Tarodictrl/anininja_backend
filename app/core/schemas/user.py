@@ -29,12 +29,13 @@ class UserListUpdate(UserListBase):
 
 
 class UserBase(BaseModelConfig):
-    email: str
+    email: str | None = None
     login: str
     avatar: str | None = None
     role: str | None = None
     registration_date: date | None = Field(alias="registrationDate", default=None)
     user_list: list[AnimeList] | None = Field(alias="animeList", default_factory=list)
+    vk_id: int | None = Field(alias="vkId", default=None)
 
 
 class UserRegistration(UserBase):

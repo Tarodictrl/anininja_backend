@@ -3,15 +3,17 @@ from typing_extensions import Annotated
 import re
 
 from fastapi import APIRouter, status, Depends, HTTPException, Response, Cookie
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
-from app.core.controllers.user import user_crud, user_list_crud
+from app.core.controllers.user import user_crud
 from app.core.schemas.user import (
     LoginSchema,
     RegistrationSchema,
-    UserResponseBase,
+    UserBase,
     UserRegistration,
+    UserResponseBase,
 )
 from app.core.security import (
     create_access_token,
@@ -19,6 +21,8 @@ from app.core.security import (
     verify_access_token,
     verify_turnstile_token
 )
+from app.api.endpoints.user.vk import VK
+from app.core.settings import settings
 
 router: APIRouter = APIRouter()
 
@@ -68,8 +72,70 @@ async def user_login(
     if not user:
         raise HTTPException(status_code=401, detail="Неверные данные для входа.")
     access_token = create_access_token({"sub": str(user.id)})
-    response.set_cookie(key="access_token", value=access_token, httponly=True)
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        expires=60 * 60 * 24 * 7
+    )
     return {'access_token': access_token}
+
+
+@router.post(
+    "/vk_auth",
+    status_code=status.HTTP_200_OK,
+)
+async def user_vk_auth(
+    code: str,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+):
+    response = await VK.validate_auth_token(code, settings.redirect_auth_uri)
+    if response is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid code.")
+    user_info = await VK.get_user_info(token=response.get("access_token"),
+                                       id=response.get("user_id"))
+    user = await user_crud.get_by_attribute(session=session, attr_name="vk_id", attr_value=user_info.get("id"))
+    if user is None:
+        user = UserBase.model_validate(dict(
+            vk_id=user_info.get("id"),
+            avatar=user_info.get("photo_200"),
+            login=user_info.get("screen_name")), strict=True)
+        await user_crud.create(session=session, obj_in=user)
+    response = RedirectResponse(url=settings.host)
+    access_token = create_access_token({"sub": str(user.id)})
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        expires=60 * 60 * 24 * 7
+    )
+    return response
+
+
+@router.post(
+    "/vk_connect",
+    status_code=status.HTTP_200_OK,
+)
+async def user_vk_connect(
+    code: str,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    access_token: str | None = Cookie(default=None),
+):
+    response = await VK.validate_auth_token(code, redirect_uri=settings.redirect_connect_uri)
+    if response is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid code.")
+    vk_id = response.get("user_id")
+    already_connected = await user_crud.get_by_attribute(session=session, attr_name="vk_id", attr_value=vk_id)
+    if already_connected:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This vk account is already connected to another user.")
+    user_id = verify_access_token(access_token)
+    user = await user_crud.get_by_attribute(session=session, attr_name="id", attr_value=user_id)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid access token.")
+
+    update_dict = {"vk_id": vk_id}
+    user = await user_crud.update(session=session, db_obj=user, obj_in=update_dict)
+
+    response = RedirectResponse(url=settings.host + "/profile")
+    return {"status": "ok"}
 
 
 @router.get(
