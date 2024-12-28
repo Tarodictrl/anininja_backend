@@ -80,7 +80,7 @@ async def user_login(
     return {'access_token': access_token}
 
 
-@router.post(
+@router.get(
     "/vk_auth",
     status_code=status.HTTP_200_OK,
 )
@@ -110,7 +110,7 @@ async def user_vk_auth(
     return response
 
 
-@router.post(
+@router.get(
     "/vk_connect",
     status_code=status.HTTP_200_OK,
 )
