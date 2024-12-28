@@ -95,11 +95,11 @@ async def user_vk_auth(
                                        id=response.get("user_id"))
     user = await user_crud.get_by_attribute(session=session, attr_name="vk_id", attr_value=user_info.get("id"))
     if user is None:
-        user = UserBase.model_validate(dict(
+        user_model = UserBase.model_validate(dict(
             vk_id=user_info.get("id"),
             avatar=user_info.get("photo_200"),
             login=user_info.get("screen_name")), strict=True)
-        await user_crud.create(session=session, obj_in=user)
+        user = await user_crud.create(session=session, obj_in=user_model)
     response = RedirectResponse(url=settings.host)
     access_token = create_access_token({"sub": str(user.id)})
     response.set_cookie(
