@@ -61,7 +61,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> list[ModelType]:
         attr = getattr(self.model, attr_name)
         db_objs = await session.scalars(select(self.model).where(attr == attr_value))
-        return db_objs.all()
+        total_obj = await session.execute(select(func.count(self.model.id)).where(attr == attr_value))
+        return db_objs.all(), total_obj.fetchone()[0]
 
     async def create(
         self, obj_in: CreateSchemaType, session: AsyncSession

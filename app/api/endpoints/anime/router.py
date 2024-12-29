@@ -11,6 +11,8 @@ from app.core.controllers.anime import anime_crud
 from app.core.mapper import BaseResponseDataMapper
 from app.core.filters.anime import AnimeFilter
 from app.core.security import verify_access_token, validate_permission
+from app.core.controllers.comment import comment_crud
+from app.core.schemas.comment import CommentResponse
 
 router: APIRouter = APIRouter()
 
@@ -65,6 +67,19 @@ async def get_by_id_anime(
 ):
     anime = await anime_crud.get_by_id(session=session, obj_id=id)
     return anime
+
+
+@router.get(
+    "/{id}/comments",
+    response_model=CommentResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_by_id_anime_comments(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    id: Annotated[int, Doc("Anime ID.")],
+):
+    comments, total = await comment_crud.get_all_by_attribute(attr_name="anime_id", attr_value=id, session=session)
+    return BaseResponseDataMapper(comments, total=total).result_schema
 
 
 @router.patch(

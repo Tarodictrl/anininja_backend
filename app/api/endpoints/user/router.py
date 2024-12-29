@@ -13,7 +13,7 @@ from app.core.schemas.user import (
     RegistrationSchema,
     UserBase,
     UserRegistration,
-    UserResponseBase,
+    UserPrivateResponseBase,
 )
 from app.core.security import (
     create_access_token,
@@ -140,13 +140,13 @@ async def user_vk_connect(
 
 @router.get(
     "/profile",
-    response_model=UserResponseBase,
+    response_model=UserPrivateResponseBase,
     status_code=status.HTTP_200_OK,
 )
 async def get_profile(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     access_token: str | None = Cookie(default=None),
-) -> UserResponseBase:
+):
     user_id = verify_access_token(access_token)
     user = await user_crud.get_profile(id=user_id, session=session)
     if user is None:
