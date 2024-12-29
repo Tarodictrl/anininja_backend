@@ -5,7 +5,7 @@ from app.core.schemas.base import BaseModelConfig
 
 
 class BaseFilter(BaseModelConfig):
-    limit: int = Field(Query(default=25, description="limit", ge=0, le=50))
+    limit: int = Field(Query(default=100, description="limit", ge=0, le=100))
     offset: int = Field(Query(default=0, description="offset"))
 
 

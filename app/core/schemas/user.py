@@ -29,11 +29,18 @@ class UserListUpdate(UserListBase):
 
 
 class UserBase(BaseModelConfig):
-    email: str | None = None
     login: str
     avatar: str | None = None
-    role: str | None = None
     registration_date: date | None = Field(alias="registrationDate", default=None)
+
+
+class UserPublic(UserBase):
+    ...
+
+
+class UserPrivate(UserBase):
+    email: str | None = None
+    role: str | None = None
     user_list: list[AnimeList] | None = Field(alias="animeList", default_factory=list)
     vk_id: int | None = Field(alias="vkId", default=None)
 
@@ -51,6 +58,14 @@ class UserCreate(UserBase):
 
 
 class UserResponseBase(UserBase):
+    id: int
+
+
+class UserPrivateResponseBase(UserPrivate):
+    id: int
+
+
+class UserPublicResponseBase(UserPublic):
     id: int
 
 
