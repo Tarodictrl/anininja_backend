@@ -104,7 +104,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                     stmt = stmt.where(literal_column(key) == value)
                 elif isinstance(value, str):
                     stmt = stmt.where(text(f"{key} ilike '%{value}%'"))
-            elif key == "genre":
+            elif key == "genre" and value is not None:
                 stmt = stmt.join(self.model.genres).where(Genre.name == value)
             elif key == "limit" and use_limit:
                 stmt = stmt.limit(value)
