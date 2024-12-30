@@ -1,3 +1,5 @@
+from typing_extensions import Literal
+
 from pydantic import Field
 from fastapi import Query
 
@@ -12,3 +14,5 @@ class BaseFilter(BaseModelConfig):
 class BaseIdNameFilter(BaseFilter):
     id: int | None = Field(Query(None, description="id"))
     name: str | None = Field(Query(None, description="name"))
+    order_by: Literal["id", "name"] | None = Field(Query(default="id", description="order_by"))
+    direction: Literal["asc", "desc"] | None = Field(Query(default="asc", description="direction"))
