@@ -100,10 +100,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                                  use_limit: bool = True, use_offset: bool = True) -> Query:
         for key, value in filter:
             if hasattr(self.model, key):
+                attr = getattr(self.model, key)
                 if isinstance(value, int):
-                    stmt = stmt.where(literal_column(key) == value)
+                    stmt = stmt.where(attr == value)
                 elif isinstance(value, str):
-                    stmt = stmt.where(text(f"{key} ilike '%{value}%'"))
+                    stmt = stmt.where(attr.ilike(f"%{value}%"))
             elif key == "genre" and value is not None:
                 stmt = stmt.join(self.model.genres).where(Genre.name == value)
             elif key == "limit" and use_limit:
