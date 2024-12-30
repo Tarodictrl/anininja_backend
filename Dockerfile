@@ -2,7 +2,7 @@ FROM python:3.11-alpine
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 WORKDIR /code
-RUN apk update
+RUN apt update
 RUN pip install --upgrade pip \
     && pip install poetry
 COPY . /code/
