@@ -79,6 +79,7 @@ async def get_by_id_anime_comments(
     id: Annotated[int, Doc("Anime ID.")],
 ):
     comments, total = await comment_crud.get_all_by_attribute(attr_name="anime_id", attr_value=id, session=session)
+
     return BaseResponseDataMapper(comments, total=total).result_schema
 
 
