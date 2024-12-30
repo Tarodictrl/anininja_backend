@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from app.core.db import Base
 from app.core.models.rating import Rating
+from app.core.models.genre import Genre
 
 ModelType = TypeVar("ModelType", bound=Base)  # type: ignore
 PydanticModel = TypeVar("PydanticModel", bound=BaseModel)
@@ -103,6 +104,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                     stmt = stmt.where(literal_column(key) == value)
                 elif isinstance(value, str):
                     stmt = stmt.where(text(f"{key} ilike '%{value}%'"))
+            elif key == "genre":
+                stmt = stmt.join(self.model.genres).where(Genre.name == value)
             elif key == "limit" and use_limit:
                 stmt = stmt.limit(value)
             elif key == "offset" and use_offset:
