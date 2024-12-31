@@ -45,7 +45,7 @@ class UserPrivate(UserBase):
     vk_id: int | None = Field(alias="vkId", default=None)
 
 
-class UserRegistration(UserBase):
+class UserRegistration(UserPrivate):
     password: str
 
 

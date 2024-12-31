@@ -5,7 +5,7 @@ This module contains a generic class for CRUD operations.
 from dataclasses import dataclass
 from typing_extensions import Any, Generic, Type, TypeVar
 
-from sqlalchemy import select, func, text, literal_column, desc, asc
+from sqlalchemy import select, func, literal_column, desc, asc
 from sqlalchemy.orm import Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
