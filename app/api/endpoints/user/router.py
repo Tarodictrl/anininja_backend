@@ -1,8 +1,10 @@
 
 from typing_extensions import Annotated
 import re
+import string
+import random
 
-from fastapi import APIRouter, status, Depends, HTTPException, Response, Cookie
+from fastapi import APIRouter, status, Depends, HTTPException, Response, Cookie, UploadFile, File
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -156,3 +158,22 @@ async def get_profile(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
+
+
+@router.patch(
+    "/profile/avatar",
+    status_code=status.HTTP_200_OK,
+)
+async def post_avatar(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    access_token: str | None = Cookie(default=None),
+    file: UploadFile = File(...),
+):
+    user_id = verify_access_token(access_token)
+    user = await user_crud.get_by_id(session=session, obj_id=user_id)
+    random_name = "".join([random.choice(string.ascii_letters + string.digits) for _ in range(10)])
+    path = settings.avatar_path + random_name
+    with open(path, "wb+") as f:
+        f.write(file.file.read())
+    await user_crud.update(session=session, db_obj=user, obj_in={"avatar": path})
+    return {"status": "ok"}

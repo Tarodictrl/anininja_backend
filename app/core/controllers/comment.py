@@ -1,13 +1,13 @@
 from app.core.controllers.base import CRUDBase
-from app.core.controllers.base import ModelType
 from app.core.models.comment import Comment
+from app.core.schemas.comment import CommentCreate, CommentUpdate
 
 
 class CommentCRUD(
     CRUDBase[
         Comment,
-        ModelType,
-        ModelType,
+        CommentCreate,
+        CommentUpdate,
     ]
 ):
     """ Comment CRUD. """
