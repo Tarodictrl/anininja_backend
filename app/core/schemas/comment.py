@@ -1,5 +1,5 @@
 from typing_extensions import Type
-from datetime import date
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 
@@ -14,20 +14,22 @@ class CommentBase(BaseModelConfig):
     message: str
     anime_id: int | None
     parent: int | None
+    user_id: int | None
 
 
 class CommentUpdate(CommentBase):
     ...
 
 
-class CommentCreate(CommentBase):
-    ...
+class CommentCreate(BaseModelConfig):
+    message: str
+    anime_id: int | None
 
 
 class CommentResponseBase(CommentBase):
     id: int
     user: UserPublicResponseBase | None = Field(default_factory=list)
-    comment_date: date
+    comment_date: datetime
 
 
 CommentResponse: Type[BaseModel] = create_response_model(CommentResponseBase, "CommentResponse")

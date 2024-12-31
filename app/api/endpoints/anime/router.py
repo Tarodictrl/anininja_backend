@@ -12,7 +12,7 @@ from app.core.mapper import BaseResponseDataMapper
 from app.core.filters.anime import AnimeFilter
 from app.core.security import verify_access_token, validate_permission
 from app.core.controllers.comment import comment_crud
-from app.core.schemas.comment import CommentResponse
+from app.core.schemas.comment import CommentCreate, CommentResponse
 
 router: APIRouter = APIRouter()
 
@@ -81,6 +81,22 @@ async def get_by_id_anime_comments(
     comments, total = await comment_crud.get_all_by_attribute(attr_name="anime_id", attr_value=id, session=session)
 
     return BaseResponseDataMapper(comments, total=total).result_schema
+
+
+@router.post(
+    "/comment",
+    status_code=status.HTTP_200_OK,
+)
+async def post_by_id_anime_comments(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    data: Annotated[CommentCreate, Doc("Comment data.")],
+    access_token: str | None = Cookie(default=None),
+):
+    user_id = verify_access_token(access_token)
+    comment_dict = data.model_dump()
+    comment_dict.update(user_id=user_id)
+    await comment_crud.create(session=session, obj_in=comment_dict)
+    return {"status": "ok"}
 
 
 @router.patch(

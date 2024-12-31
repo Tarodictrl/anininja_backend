@@ -66,9 +66,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_objs.all(), total_obj.fetchone()[0]
 
     async def create(
-        self, obj_in: CreateSchemaType, session: AsyncSession
+        self, obj_in: CreateSchemaType | dict, session: AsyncSession
     ) -> ModelType:
-        obj_in_data = obj_in.model_dump()
+        if isinstance(obj_in, dict):
+            obj_in_data = obj_in
+        else:
+            obj_in_data = obj_in.model_dump()
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
         await session.commit()

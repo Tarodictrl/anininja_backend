@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     host: Annotated[str, Doc("Host for redirect.")]
     telegram_token: Annotated[str, Doc("Telegram token.")]
     telegram_bot_id: Annotated[str, Doc("Telegram bot id.")]
+    avatar_path: Annotated[str, Doc("Path to save avatar.")]
 
     @property
     def api_version(self) -> Annotated[str, Doc("The current project version")]:
