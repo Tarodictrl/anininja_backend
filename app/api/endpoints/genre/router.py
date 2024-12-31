@@ -4,11 +4,10 @@ from fastapi import APIRouter, status, Depends, Cookie
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.schemas.genre import GenreResponse, GenreResponseBase, GenreCreate, GenreUpdate
+from app.core.schemas.genre import GenreResponseBase, GenreCreate, GenreUpdate
 from app.core.db import get_async_session
 from app.core.controllers.genre import genre_crud
-from app.core.mapper import BaseResponseDataMapper
-from app.core.filters.base import BaseIdNameFilter
+from app.core.filters.base import BaseIdNameFilterWithoutLimit
 from app.core.security import verify_access_token, validate_permission
 
 router: APIRouter = APIRouter()
@@ -16,19 +15,16 @@ router: APIRouter = APIRouter()
 
 @router.get(
     "/",
-    response_model=GenreResponse,
+    response_model=list[GenreResponseBase],
     status_code=status.HTTP_200_OK,
 )
 async def get_all_genres(
     session: Annotated[AsyncSession, Depends(get_async_session)],
-    filter: BaseIdNameFilter = Depends(),
+    filter: BaseIdNameFilterWithoutLimit = Depends(),
 ):
 
-    genres, total = await genre_crud.get_all(session=session, filter=filter)
-    return BaseResponseDataMapper(
-        genres, total=total,
-        limit=filter.limit, offset=filter.offset
-    ).result_schema
+    genres, _ = await genre_crud.get_all(session=session, filter=filter)
+    return genres
 
 
 @router.get(

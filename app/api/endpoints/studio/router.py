@@ -4,11 +4,10 @@ from fastapi import APIRouter, status, Depends, Cookie
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.schemas.studio import StudioResponse, StudioResponseBase, StudioUpdate, StudioCreate
+from app.core.schemas.studio import StudioResponseBase, StudioUpdate, StudioCreate
 from app.core.db import get_async_session
 from app.core.controllers.studio import studio_crud
-from app.core.mapper import BaseResponseDataMapper
-from app.core.filters.base import BaseIdNameFilter
+from app.core.filters.base import BaseIdNameFilterWithoutLimit
 from app.core.security import verify_access_token, validate_permission
 
 router: APIRouter = APIRouter()
@@ -16,19 +15,16 @@ router: APIRouter = APIRouter()
 
 @router.get(
     "/",
-    response_model=StudioResponse,
+    response_model=list[StudioResponseBase],
     status_code=status.HTTP_200_OK,
 )
 async def get_all_studios(
     session: Annotated[AsyncSession, Depends(get_async_session)],
-    filter: BaseIdNameFilter = Depends(),
+    filter: BaseIdNameFilterWithoutLimit = Depends(),
 ):
 
-    studios, total = await studio_crud.get_all(session=session, filter=filter)
-    return BaseResponseDataMapper(
-        studios, total=total,
-        limit=filter.limit, offset=filter.offset
-    ).result_schema
+    studios, _ = await studio_crud.get_all(session=session, filter=filter)
+    return studios
 
 
 @router.get(
