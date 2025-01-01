@@ -53,7 +53,7 @@ async def user_registration(
     obj_in = UserRegistration(**data)
     obj_db = await user_crud.create(obj_in=obj_in, session=session)
     access_token = create_access_token({"sub": str(obj_db.id)})
-    response.set_cookie(key="access_token", value=access_token, httponly=True, domain=f".{settings.host.split('//')[1]}")
+    response.set_cookie(key="access_token", value=access_token, httponly=True, domain=f".{settings.host.split('//')[1]}", samesite="none")
     return {'access_token': access_token}
 
 
@@ -78,6 +78,7 @@ async def user_login(
         key="access_token",
         value=access_token,
         domain=f".{settings.host.split('//')[1]}",
+        samesite="none",
         expires=60 * 60 * 24 * 7
     )
     return {'access_token': access_token}
@@ -109,6 +110,7 @@ async def user_vk_auth(
         key="access_token",
         value=access_token,
         domain=f".{settings.host.split('//')[1]}",
+        samesite="none",
         expires=60 * 60 * 24 * 7
     )
     return response
