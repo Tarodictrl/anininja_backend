@@ -30,6 +30,7 @@ class User(Base):
     )
     avatar: Mapped[str] = mapped_column(
         String,
+        default="https://img.anininja.ru/avatar/placeholder.jpeg"
     )
     role: Mapped[str] = mapped_column(
         String,
